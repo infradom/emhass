@@ -14,6 +14,7 @@ import plotly.express as px
 from emhass.command_line import set_input_data_dict
 from emhass.command_line import perfect_forecast_optim, dayahead_forecast_optim, naive_mpc_optim
 from emhass.command_line import publish_data
+from time import time
 
 
 # Define the Flask instance
@@ -133,6 +134,7 @@ def action_call(action_name):
     runtimeparams = json.dumps(runtimeparams)
     input_data_dict = set_input_data_dict(config_path, str(config_path.parent), costfun, 
         params, runtimeparams, action_name, app.logger)
+    ts_start = time()
     if action_name == 'publish-data':
         app.logger.info(" >> Publishing data...")
         _ = publish_data(input_data_dict, app.logger)
@@ -166,6 +168,7 @@ def action_call(action_name):
         app.logger.error("ERROR: passed action is not valid")
         msg = f'EMHASS >> ERROR: Passed action is not valid... \n'
         return make_response(msg, 400)
+    app.logger.info(f"action {action_name} took {time()-tsstart}seconds")
 
 if __name__ == "__main__":
     # Parsing arguments
